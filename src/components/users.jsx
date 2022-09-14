@@ -1,13 +1,9 @@
 import React, {useState} from 'react'
 import API from '../API/API/index'
 
-
-
 const Users = () => {
-    console.log(API.users.fetchAll());
     const [usersList, setUserList] = useState(API.users.fetchAll())
     const [userMeetYouCount, setUserMeetYouCount] = useState(usersList.length)
-
 
     const renderUsersList = () => {
         
@@ -20,7 +16,7 @@ const Users = () => {
                         <td>{user.profession.name}</td>
                         <td>{user.completedMeetings}</td>
                         <td>{user.rate}</td>
-                        <td><button type="button" className="btn btn-danger btn-sm" onClick={() => handleDeletUser(user)}>Удалить</button></td>
+                        <td><button type="button" className="btn btn-danger btn-sm" onClick={() => handleDeleteUser(user._id)}>Удалить</button></td>
                     </tr>
                     
             })
@@ -29,21 +25,28 @@ const Users = () => {
 
     const renderUserQualities = (userQualities) => {
         return userQualities.map(qualiti => {
-            return <span key={qualiti._id} className={'badge bg-' + qualiti.color}>{qualiti.name}</span>
+            return <span key={qualiti._id} className={'badge m-1 bg-' + qualiti.color}>{qualiti.name}</span>
         })
     }
 
-    const handleDeletUser = (deletingUser) => {
+    const handleDeleteUser = (deletingUserId) => {
         setUserMeetYouCount((prevState) => prevState - 1)        
-        setUserList((prevState) => prevState.filter((user) => deletingUser._id !== user._id))
+        setUserList((prevState) => prevState.filter((user) => deletingUserId !== user._id))
     }
 
     const renderMeetingUsers = () => {
-        const lastNum = String(userMeetYouCount).slice(-1);
-        const endingWord = (lastNum > 1 && lastNum < 5) ? 'а' : ''
+        //функция внутри функции только потому что она больше не где во внешнем коде не будет использоваться(специфическая)
+        const setVariableWord = () => {
+            console.log('Почему 2 раза выполняется тело функции если вызов был только 1 ?');
+            const lastNum = Number(String(userMeetYouCount).slice(-1))
+            if(lastNum === 1) return 'Человек тусанет'
+            if(userMeetYouCount > 4 && userMeetYouCount < 21) return `Человек тусанет`
+            if([2, 3, 4].indexOf(lastNum) >= 0) return 'Человека тусанут'
+            
+        }
 
         return (userMeetYouCount !== 0 )
-                ? <span className="badge bg-info text-dark"> {`${userMeetYouCount} : человек${endingWord} тусанет с тобой сегодня ;)`} </span>
+                ? <span className="badge bg-info text-dark"> {`${userMeetYouCount} : ${setVariableWord()} с тобой сегодня ;)`} </span>
                 : <span className="badge bg-danger"> Не кто не тусанет с тобой сегодня :( </span>                               
     }
 
@@ -51,7 +54,8 @@ const Users = () => {
         <>
             { renderMeetingUsers() }
 
-            <table className="table">
+            {
+                usersList.length > 0 && <table className="table">
                 <thead>
                     <tr>
                         <th scope="col">Имя</th>
@@ -59,15 +63,15 @@ const Users = () => {
                         <th scope="col">Профессия</th>
                         <th scope="col">Встретился, раз</th>
                         <th scope="col">Оценка</th>
-                        <th></th>
+                        <th />
                     </tr>
                 </thead>
                 <tbody>
                     { renderUsersList() }
                 </tbody>
-            </table>
+            </table> 
+            }
         </>
-        
     )
 }
 
