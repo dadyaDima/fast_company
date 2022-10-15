@@ -1,15 +1,45 @@
-import React from 'react'
-import User from './user'
-import MeetingUsers from './meetingUsers'
+import React, { useState } from "react";
+import API from "../API/index";
+import User from "./user";
+import MeetingUsers from "./meetingUsers";
+import Pagination from "./pagination";
+import { paginate } from "../utils/paginate";
 
-const Users = ({usersList, userMeetYouCount, onDeleteUser, onToggleBookmark}) => {
+const Users = () => {
+    const [usersList, setUserList] = useState(API.users.fetchAll());
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const usersLength = usersList.length;
+    const pagesSize = 4;
+    const userCrops = paginate(usersList, currentPage, pagesSize);
+
+    const handleDeleteUser = (deletingUserId) => {
+        setUserList((prevState) =>
+            prevState.filter((user) => deletingUserId !== user._id)
+        );
+    };
+
+    const handleToggleBookmark = (user_id) => {
+        const updatedBookmarks = usersList.map((user) => {
+            if (user._id === user_id) {
+                user.bookmark = !user.bookmark;
+                return user;
+            }
+            return user;
+        });
+        setUserList(updatedBookmarks);
+    };
+
+    const handlePageChanges = (page) => {
+        setCurrentPage(page);
+    };
 
     return (
         <>
-            <MeetingUsers userMeetYouCount={userMeetYouCount} />
+            <MeetingUsers userMeetYouCount={usersLength} />
 
-            {
-                usersList.length > 0 && <table className="table">
+            {usersLength > 0 && (
+                <table className="table">
                     <thead>
                         <tr>
                             <th scope="col">Имя</th>
@@ -22,17 +52,27 @@ const Users = ({usersList, userMeetYouCount, onDeleteUser, onToggleBookmark}) =>
                         </tr>
                     </thead>
                     <tbody>
-                        {usersList.map((user) => <User  key={user._id} 
-                                                        usersList={usersList}
-                                                        user={user} 
-                                                        onDeleteUser={onDeleteUser}
-                                                        onToggleBookmark={onToggleBookmark}
-                                                />)}
+                        {userCrops.map((user) => (
+                            <User
+                                key={user._id}
+                                usersList={usersList}
+                                user={user}
+                                onDeleteUser={handleDeleteUser}
+                                onToggleBookmark={handleToggleBookmark}
+                            />
+                        ))}
                     </tbody>
-                </table> 
-            }
-        </>
-    )
-}
+                </table>
+            )}
 
-export default Users
+            <Pagination
+                usersLength={usersLength}
+                pagesSize={pagesSize}
+                onPageChange={handlePageChanges}
+                currentPage={currentPage}
+            />
+        </>
+    );
+};
+
+export default Users;

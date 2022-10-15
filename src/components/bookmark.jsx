@@ -1,9 +1,16 @@
-import React from 'react'
+import React from "react";
+import PropTypes from "prop-types";
 
-const Bookmarks = ({usersList, userId}) => {
-    const selectedUser = usersList.find(user => user._id === userId)
+const Bookmarks = ({ usersList, userId, onItemClick }) => {
+    const selectedUser = usersList.find((user) => user._id === userId);
 
-    return selectedUser.bookmark ? <i className="bi bi-bookmark-plus"></i> : <i className="bi bi-bookmark-plus-fill"></i>
-}
+    return selectedUser.bookmark ? (<i className="bi bi-heart-fill" onClick={() => onItemClick(userId)}></i>) : (<i className="bi bi-heart" onClick={() => onItemClick(userId)}></i>);
+};
 
-export default Bookmarks
+Bookmarks.propTypes = {
+    usersList: PropTypes.array.isRequired,
+    userId: PropTypes.string.isRequired,
+    onItemClick: PropTypes.func.isRequired
+};
+
+export default Bookmarks;
