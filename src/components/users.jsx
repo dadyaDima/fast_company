@@ -19,9 +19,9 @@ const Users = () => {
         );
     };
 
-    const handleToggleBookmark = (user_id) => {
+    const handleToggleBookmark = (userId) => {
         const updatedBookmarks = usersList.map((user) => {
-            if (user._id === user_id) {
+            if (user._id === userId) {
                 user.bookmark = !user.bookmark;
                 return user;
             }
