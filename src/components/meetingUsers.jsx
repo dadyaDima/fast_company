@@ -14,7 +14,7 @@ const MeetingUsers = ({ userMeetYouCount }) => {
 };
 
 MeetingUsers.propTypes = {
-    userMeetYouCount: PropTypes.func.isRequired
+    userMeetYouCount: PropTypes.number
 };
 
 export default MeetingUsers;
